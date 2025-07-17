@@ -1,26 +1,5 @@
-<svg width="420" height="220" viewBox="0 0 420 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    .node { font-family: Arial, sans-serif; font-size: 15px; fill: #222; }
-    .rect { fill: #fff; stroke: #222; stroke-width: 2; rx: 8; }
-    .rect-blue { fill: #cce0ff; stroke: #222; stroke-width: 2; rx: 8; }
-    .arrow { stroke: #222; stroke-width: 2; marker-end: url(#arrowhead); }
-  </style>
-  <defs>
-    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#222"/>
-    </marker>
-  </defs>
-  <!-- Nodes -->
-  <rect class="rect" x="30" y="20" width="180" height="40"/>
-  <text class="node" x="120" y="45" text-anchor="middle">Anchor Browser Agent</text>
-  <rect class="rect" x="210" y="80" width="160" height="40"/>
-  <text class="node" x="290" y="105" text-anchor="middle">Start Session</text>
-  <rect class="rect-blue" x="110" y="140" width="260" height="40"/>
-  <text class="node" x="240" y="165" text-anchor="middle">Data Entry: Fill &amp; Submit Web Form</text>
-  <rect class="rect" x="110" y="200" width="180" height="40"/>
-  <text class="node" x="200" y="225" text-anchor="middle">Form Submission Result</text>
-  <!-- Arrows -->
-  <line class="arrow" x1="210" y1="40" x2="210" y2="100" />
-  <line class="arrow" x1="290" y1="120" x2="240" y2="140" />
-  <line class="arrow" x1="240" y1="180" x2="200" y2="200" />
-</svg>
+graph TD
+    B["Anchor Browser Agent"] --> C["Start Session"]
+    C --> D["Data Collection: Access Dashboard"]
+    D --> E["Extract Structured Data"]
+    E --> F["Get Data Output"]
