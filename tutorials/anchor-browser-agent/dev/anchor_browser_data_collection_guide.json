@@ -25,14 +25,14 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Requirements\n\n- Python 3.x or Node.js\n- Anchor Browser Agent account ([Sign up here](https://anchorbrowser.io?utm_source=agents-towards-production))\n- Anchor Browser Agent API key ([Get from dashboard](https://anchorbrowser.io?utm_source=agents-towards-production))\n- For Python: `playwright`, `requests`\n- For Node.js: `playwright-core`, `axios`\n\n**Signup page:**\n<img src=\"./assets/signup.png\" alt=\"Signup\" width=\"400\"/>\n\n**API Key section:**\n<img src=\"./assets/dashboard.png\" alt=\"API Key\" width=\"400\"/>\n"
+    "## Requirements\n\n- Python 3.x\n- Anchor Browser Agent account ([Sign up here](https://anchorbrowser.io?utm_source=agents-towards-production))\n- Anchor Browser Agent API key ([Get from dashboard](https://anchorbrowser.io?utm_source=agents-towards-production))\n- Python packages: `playwright`, `requests`\n\n**Signup page:**\n<img src=\"./assets/signup.png\" alt=\"Signup\" width=\"400\"/>\n\n**API Key section:**\n<img src=\"./assets/dashboard.png\" alt=\"API Key\" width=\"400\"/>\n"
    ]
   },
   {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Getting Started\n\n### 1. Sign Up and Get Your API Key\n- Go to [anchorbrowser.io](https://anchorbrowser.io?utm_source=agents-towards-production) and sign up.\n- After login, your API key will be visible on the main page.\n\n### 2. Install Dependencies\n- **Python:**\n    ```bash\n    pip install playwright requests\n    playwright install chromium\n    ```\n- **Node.js:**\n    ```bash\n    npm install playwright-core axios\n    ```\n\n### 3. Configure Environment\n- Set your API key as an environment variable:\n    ```bash\n    export ANCHOR_API_KEY=\"your-api-key-here\"\n    ```\n"
+    "## Getting Started\n\n1. **Sign Up and Get Your API Key**\n   - Go to [anchorbrowser.io](https://anchorbrowser.io?utm_source=agents-towards-production) and sign up.\n   - After login, your API key will be visible on the main page.\n2. **Install Dependencies**\n   ```bash\n   pip install playwright requests\n   playwright install chromium\n   ```\n3. **Configure Environment**\n   - Set your API key as an environment variable:\n   ```bash\n   export ANCHOR_API_KEY=\"your-api-key-here\"\n   ```\n"
    ]
   },
   {
@@ -46,14 +46,14 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Use Case: Data Collection (Grafana Dashboard)\n\n### Scenario\nAn AI agent collects data from a Grafana dashboard. If authentication is required, use a browser profile. The agent extracts structured data from the dashboard.\n\n**Grafana dashboard example:**\n<img src=\"./assets/grafana-dashboard.png\" alt=\"Grafana Dashboard\" width=\"400\"/>\n\n### Step 1: Create or Load Browser Profile\n"
+    "## Use Case: Data Collection (Grafana Dashboard)\n\n### Scenario\nAn AI agent collects data from a Grafana dashboard using Anchor Browser Agent. The agent connects to a cloud browser session and uses the built-in AI agent to extract structured data from the dashboard.\n\n**Grafana dashboard example:**\n<img src=\"./assets/grafana-dashboard.png\" alt=\"Grafana Dashboard\" width=\"400\"/>\n\n### Step 1: Connect to Anchor Browser Agent and Collect Data\n\nThe following code demonstrates how to connect to Anchor Browser Agent using Playwright for Python, navigate to a Grafana dashboard, and collect data.\n"
    ]
   },
   {
    "cell_type": "code",
    "metadata": {},
    "source": [
-    "def create_profile():\n    ANCHOR_API_KEY = os.getenv(\"ANCHOR_API_KEY\")\n    profile_configuration = {\n        \"name\": \"grafana-user\",\n        \"description\": \"Profile for authenticated Grafana access\"\n    }\n    response = requests.post(\n        \"https://api.anchorbrowser.io/v1/profiles\",\n        json=profile_configuration,\n        headers={\n            \"anchor-api-key\": ANCHOR_API_KEY,\n            \"Content-Type\": \"application/json\",\n        }\n    )\n    return response.json()[\"data\"]\n"
+    "import os\nimport requests\nfrom playwright.sync_api import sync_playwright\nANCHOR_API_KEY = os.getenv(\"ANCHOR_API_KEY\")\n\nconnection_string = f\"wss://connect.anchorbrowser.io?apiKey={ANCHOR_API_KEY}\"\n\nwith sync_playwright() as p:\n    browser = p.chromium.connect_over_cdp(connection_string)\n    context = browser.contexts[0]\n    ai = context.service_workers[0]\n    page = context.pages[0]\n\n    page.goto(\n        \"https://play.grafana.org/a/grafana-k8s-app/navigation/nodes?from=now-1h&to=now&refresh=1m\",\n        wait_until=\"domcontentloaded\"\n    )\n    result = ai.evaluate('Collect the node names and their CPU average %, return in JSON array')\n    print(result)\n"
    ],
    "outputs": [],
    "execution_count": null
@@ -69,7 +69,7 @@
    "cell_type": "code",
    "metadata": {},
    "source": [
-    "def collect_dashboard_data(profile):\n    ANCHOR_API_KEY = os.getenv(\"ANCHOR_API_KEY\")\n    with sync_playwright() as p:\n        browser = p.chromium.connect_over_cdp(\n            f\"wss://connect.anchorbrowser.io?apiKey={ANCHOR_API_KEY}&profileId={profile['id']}\"\n        )\n        context = browser.contexts[0]\n        page = context.pages()[0]\n        # Navigate to Grafana dashboard\n        page.goto('https://play.grafana.org/d/000000012/grafana-play-home?orgId=1')\n        # Example: Extract structured data (replace with actual extraction logic)\n        data = page.evaluate(\"() => { return { title: document.title, panels: Array.from(document.querySelectorAll('.panel-title')).map(e => e.innerText) } }\")\n        print(\"Extracted data:\", data)\n        browser.close()\n        return data\n"
+    "import os\nimport requests\nfrom playwright.sync_api import sync_playwright\nANCHOR_API_KEY = os.getenv(\"ANCHOR_API_KEY\")\nwith sync_playwright() as p:\n   browser = p.chromium.connect_over_cdp(f\"wss://connect.anchorbrowser.io?apiKey={ANCHOR_API_KEY}\")\n   context = browser.contexts[0]\n   target_url = \"chrome-extension://bppehibnhionalpjigdjdilknbljaeai/background.js\"\n   ai = next((sw for sw in context.service_workers if sw.url == target_url), None)\n            \n   # Use the embedded 'ai' object\n   result = ai.evaluate('Find the last game played by Milwaukee in the NBA and return the result')\n   print(result)"
    ],
    "outputs": [],
    "execution_count": null
