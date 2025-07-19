@@ -19,8 +19,8 @@ def data_collection_example(connection_string = f"wss://connect.anchorbrowser.io
         return result
 
 
-def create_session_with_profile(ANCHOR_API_KEY=ANCHOR_API_KEY, profile_name = "my-profile"):
-    # Create a session with a profile
+# Create a session with a profile
+def create_session_with_profile(profile_name = "my-profile"):
     url = "https://api.anchorbrowser.io/v1/sessions"
 
     payload = {
